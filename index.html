@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Задачи — Минималистичный Трекер</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -22,12 +23,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-
-    <!-- Manifest для PWA / Samsung / Android -->
-<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRhc2sgVHJhY2tlciIsCiAgInNob3J0X25hbWUiOiAiVGFza3MiLAogICJzdGFydF91cmwiOiAiLi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwZjE3MmEiLAogICJ0aGVtZV9jb2xvciI6ICIjMGYxNzJhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvZmZpY29ucy8yLjEuMC9zdmcvdG8tZG8uc3ZnIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgotICAgIH0KICBdCn0=">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0f172a">
+    <!-- Корректное PWA подключение -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#090d16">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/906/906334.png">
     
     <style>
         .custom-checkbox {
@@ -157,7 +159,7 @@
             <section id="activeSection">
                 <div id="activeTaskList" class="space-y-1"></div>
                 <div id="emptyActive" class="hidden py-12 text-center">
-                    <p class="text-sm text-zinc-400 dark:text-zinc-600">Все задачи выполнены. Время отдохнуть ✨</p>
+                    <p class="text-sm text-zinc-400 dark:text-zinc-600">Все задачи выполнены ✨</p>
                 </div>
             </section>
 
@@ -197,7 +199,7 @@
                     <input 
                         type="text" 
                         id="syncCodeInput" 
-                        placeholder="Код (например: my-tasks-777)"
+                        placeholder="Код (например: айдай)"
                         class="flex-grow bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs rounded-xl px-3 py-2.5 outline-none focus:border-zinc-900 dark:focus:border-zinc-300 font-mono text-zinc-900 dark:text-zinc-100"
                     >
                     <button id="applySyncCodeBtn" class="px-4 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 transition-opacity rounded-xl text-xs font-medium">
@@ -233,18 +235,9 @@
         const db = getFirestore(app);
 
         // --- State Management ---
-        let tasks = JSON.parse(localStorage.getItem('minimal_tasks')) || [
-            { id: 1, text: 'Добро пожаловать в трекер задач', completed: false },
-            { id: 2, text: 'Нажмите на квадратик слева, чтобы завершить', completed: false },
-            { id: 3, text: 'Двойной клик по тексту для редактирования', completed: true }
-        ];
+        let tasks = JSON.parse(localStorage.getItem('minimal_tasks')) || [];
 
-        // Generate or retrieve room code
-        let syncCode = localStorage.getItem('minimal_sync_code');
-        if (!syncCode) {
-            syncCode = 'room-' + Math.random().toString(36).substring(2, 8);
-            localStorage.setItem('minimal_sync_code', syncCode);
-        }
+        let syncCode = localStorage.getItem('minimal_sync_code') || 'айдай';
 
         let unsubscribeFirestore = null;
 
@@ -271,16 +264,14 @@
         const modalStatusText = document.getElementById('modalStatusText');
 
         async function saveTasks() {
-            // Local backup
             localStorage.setItem('minimal_tasks', JSON.stringify(tasks));
 
-            // Sync to Firestore
             if (syncCode) {
                 try {
                     const docRef = doc(db, 'tasks', syncCode);
                     await setDoc(docRef, { tasks: tasks, updatedAt: Date.now() }, { merge: true });
                 } catch (err) {
-                    console.error("Ошибка сохранени в Firestore:", err);
+                    console.error("Ошибка сохранения в Firestore:", err);
                     modalStatusText.textContent = "Ошибка сети";
                     modalStatusText.className = "font-medium text-amber-500";
                 }
@@ -297,7 +288,6 @@
                     localStorage.setItem('minimal_tasks', JSON.stringify(tasks));
                     render();
                 } else {
-                    // Push local tasks if empty cloud document
                     saveTasks();
                 }
                 syncBadge.classList.remove('hidden');
@@ -430,7 +420,6 @@
             input.select();
         }
 
-        // Task Event Listeners
         taskInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') addTask(taskInput.value);
         });
@@ -487,25 +476,22 @@
             setThemeIcon(isDark);
         });
 
-        // Initialize App & Firestore Listener
         initTheme();
         render();
         if (syncCode) {
             subscribeToCloud(syncCode);
         }
     </script>
-  <script>
-  // Простой Service Worker для включения критериев PWA
-  if ('serviceWorker' in navigator) {
-    const swCode = `
-      self.addEventListener('install', (e) => self.skipWaiting());
-      self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
-      self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
-    `;
-    const blob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl).catch(() => {});
-  }
-</script>
+
+    <!-- Корректная регистрация физического Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW зарегистрирован:', reg))
+            .catch(err => console.error('Ошибка SW:', err));
+        });
+      }
+    </script>
 </body>
 </html>
