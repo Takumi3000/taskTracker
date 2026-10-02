@@ -1,261 +1,549 @@
-
 ```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasks</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<title>Tasks</title>
 
-        body {
-            margin: 0;
-            background: #fff;
-            color: #111;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
 
-        .app {
-            width: min(900px, calc(100% - 40px));
-            margin: 70px auto;
-        }
+:root {
+    --bg: #f4f3ef;
+    --text: #171716;
+    --muted: #9b9a94;
+    --line: #d9d7d0;
+    --accent: #171716;
+    --hover: #ebe9e3;
+}
 
-        h1 {
-            margin: 0 0 45px;
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        .list {
-            display: flex;
-            flex-direction: column;
-        }
+html {
+    background: var(--bg);
+}
 
-        .task {
-            display: flex;
-            align-items: center;
-            min-height: 42px;
-            font-size: 17px;
-            line-height: 1.4;
-        }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
 
-        .checkbox {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 1px solid #999;
-            margin: 0 14px 0 0;
-            cursor: pointer;
-            flex: 0 0 auto;
-        }
+::selection {
+    background: #171716;
+    color: #fff;
+}
 
-        .checkbox:checked {
-            background: #111;
-            border-color: #111;
-        }
+.app {
+    width: min(920px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 90px 0 120px;
+}
 
-        .checkbox:checked::after {
-            content: "✓";
-            display: block;
-            color: white;
-            font-size: 11px;
-            line-height: 14px;
-            text-align: center;
-        }
+/* HEADER */
 
-        .task-text {
-            outline: none;
-            min-width: 20px;
-            flex: 1;
-        }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+}
 
-        .task.completed .task-text {
-            color: #999;
-            text-decoration: line-through;
-        }
+.title {
+    margin: 0;
+    font-size: clamp(42px, 7vw, 76px);
+    font-weight: 600;
+    letter-spacing: -0.065em;
+    line-height: .9;
+}
 
-        .add-task {
-            margin-top: 8px;
-            min-height: 42px;
-            display: flex;
-            align-items: center;
-        }
+.counter {
+    font-family: "DM Mono", monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
 
-        .add-input {
-            border: 0;
-            outline: 0;
-            width: 100%;
-            padding: 0;
-            font: inherit;
-            font-size: 17px;
-            color: #111;
-            background: transparent;
-        }
+/* LIST */
 
-        .add-input::placeholder {
-            color: #bbb;
-        }
+.list {
+    display: flex;
+    flex-direction: column;
+}
 
-        .section {
-            margin-top: 65px;
-        }
+.task {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 16px;
+    align-items: center;
 
-        .section-title {
-            margin-bottom: 12px;
-            font-size: 11px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
+    min-height: 62px;
+    border-bottom: 1px solid var(--line);
 
-        @media (max-width: 600px) {
-            .app {
-                width: calc(100% - 28px);
-                margin: 35px auto;
-            }
+    transition:
+        background .2s ease,
+        color .2s ease;
+}
 
-            h1 {
-                margin-bottom: 30px;
-            }
+.task:hover {
+    background: var(--hover);
+}
 
-            .task,
-            .add-input {
-                font-size: 16px;
-            }
-        }
-    </style>
+.checkbox {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+
+    border: 1px solid #85847e;
+    border-radius: 2px;
+
+    margin: 0;
+    cursor: pointer;
+
+    position: relative;
+}
+
+.checkbox:hover {
+    border-color: var(--text);
+}
+
+.checkbox:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.checkbox:checked::after {
+    content: "";
+    position: absolute;
+
+    width: 5px;
+    height: 9px;
+
+    left: 4px;
+    top: 1px;
+
+    border-right: 1.5px solid white;
+    border-bottom: 1.5px solid white;
+
+    transform: rotate(45deg);
+}
+
+.task-text {
+    min-width: 0;
+
+    padding: 19px 20px 19px 0;
+
+    outline: none;
+
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -.015em;
+
+    cursor: text;
+}
+
+.task.completed {
+    color: var(--muted);
+}
+
+.task.completed .task-text {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: #aaa8a1;
+}
+
+/* ADD */
+
+.add {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 16px;
+    align-items: center;
+
+    min-height: 62px;
+
+    border-bottom: 1px solid var(--line);
+}
+
+.add-symbol {
+    width: 15px;
+    height: 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--muted);
+
+    font-size: 17px;
+    font-weight: 300;
+}
+
+.add-input {
+    width: 100%;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+
+    padding: 19px 20px 19px 0;
+
+    font-family: inherit;
+    font-size: 18px;
+    color: var(--text);
+
+    letter-spacing: -.015em;
+}
+
+.add-input::placeholder {
+    color: #aaa9a3;
+}
+
+/* COMPLETED */
+
+.completed-section {
+    margin-top: 80px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-family: "DM Mono", monospace;
+
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+
+    color: var(--muted);
+}
+
+.section-count {
+    font-family: "DM Mono", monospace;
+
+    font-size: 10px;
+    color: var(--muted);
+}
+
+/* EMPTY */
+
+.empty {
+    padding: 35px 0;
+
+    color: var(--muted);
+
+    font-family: "DM Mono", monospace;
+    font-size: 10px;
+
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .app {
+        width: calc(100% - 28px);
+        padding: 42px 0 80px;
+    }
+
+    .header {
+        padding-bottom: 20px;
+    }
+
+    .title {
+        font-size: 48px;
+    }
+
+    .task,
+    .add {
+        grid-template-columns: 20px 1fr;
+        gap: 13px;
+        min-height: 58px;
+    }
+
+    .task-text,
+    .add-input {
+        font-size: 16px;
+        padding-top: 17px;
+        padding-bottom: 17px;
+    }
+
+    .completed-section {
+        margin-top: 60px;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<div class="app">
+<main class="app">
 
-    <h1>Tasks</h1>
+    <header class="header">
+        <h1 class="title">Tasks</h1>
+        <div class="counter" id="activeCounter">0 active</div>
+    </header>
 
-    <div class="list" id="activeList"></div>
+    <section class="list" id="activeList"></section>
 
-    <div class="add-task">
+    <div class="add">
+        <div class="add-symbol">+</div>
+
         <input
             id="newTask"
             class="add-input"
             type="text"
-            placeholder="Новая задача..."
+            placeholder="Add task"
             autocomplete="off"
         >
     </div>
 
-    <div class="section">
-        <div class="section-title">Completed</div>
-        <div class="list" id="completedList"></div>
-    </div>
+    <section class="completed-section">
 
-</div>
+        <div class="section-header">
+            <div class="section-title">Completed</div>
+            <div class="section-count" id="completedCounter">0</div>
+        </div>
+
+        <div class="list" id="completedList"></div>
+
+    </section>
+
+</main>
 
 <script>
-    const STORAGE_KEY = "tasks";
 
-    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-        { id: crypto.randomUUID(), text: "Сделать первый проект", completed: false },
-        { id: crypto.randomUUID(), text: "Разобраться с задачами", completed: false }
-    ];
+const STORAGE_KEY = "minimal-tasks";
 
-    const activeList = document.getElementById("activeList");
-    const completedList = document.getElementById("completedList");
-    const newTask = document.getElementById("newTask");
-
-    function save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+    {
+        id: crypto.randomUUID(),
+        text: "Сделать монтаж фестиваля",
+        completed: false
+    },
+    {
+        id: crypto.randomUUID(),
+        text: "Написать клиенту",
+        completed: false
+    },
+    {
+        id: crypto.randomUUID(),
+        text: "Дополнить материалы курса",
+        completed: false
     }
+];
 
-    function render() {
-        activeList.innerHTML = "";
-        completedList.innerHTML = "";
+const activeList = document.getElementById("activeList");
+const completedList = document.getElementById("completedList");
 
-        tasks
-            .filter(task => !task.completed)
-            .forEach(task => {
-                activeList.appendChild(createTask(task));
-            });
+const newTask = document.getElementById("newTask");
 
-        tasks
-            .filter(task => task.completed)
-            .forEach(task => {
-                completedList.appendChild(createTask(task));
-            });
-    }
+const activeCounter = document.getElementById("activeCounter");
+const completedCounter = document.getElementById("completedCounter");
 
-    function createTask(task) {
-        const row = document.createElement("div");
-        row.className = "task" + (task.completed ? " completed" : "");
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "checkbox";
-        checkbox.checked = task.completed;
+function save() {
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(tasks)
+    );
+}
 
-        const text = document.createElement("div");
-        text.className = "task-text";
-        text.contentEditable = "true";
-        text.spellcheck = false;
-        text.textContent = task.text;
 
-        checkbox.addEventListener("change", () => {
-            task.completed = checkbox.checked;
-            save();
-            render();
-        });
+function createTask(task) {
 
-        text.addEventListener("blur", () => {
-            const value = text.textContent.trim();
+    const row = document.createElement("div");
 
-            if (!value) {
-                tasks = tasks.filter(t => t.id !== task.id);
-            } else {
-                task.text = value;
-            }
+    row.className =
+        "task" +
+        (task.completed ? " completed" : "");
 
-            save();
-            render();
-        });
 
-        text.addEventListener("keydown", event => {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                text.blur();
-            }
-        });
+    const checkbox = document.createElement("input");
 
-        row.appendChild(checkbox);
-        row.appendChild(text);
+    checkbox.type = "checkbox";
+    checkbox.className = "checkbox";
+    checkbox.checked = task.completed;
 
-        return row;
-    }
 
-    newTask.addEventListener("keydown", event => {
-        if (event.key !== "Enter") return;
+    const text = document.createElement("div");
 
-        const text = newTask.value.trim();
+    text.className = "task-text";
 
-        if (!text) return;
+    text.contentEditable = "true";
 
-        tasks.push({
-            id: crypto.randomUUID(),
-            text,
-            completed: false
-        });
+    text.spellcheck = false;
 
-        newTask.value = "";
+    text.textContent = task.text;
+
+
+    checkbox.addEventListener("change", () => {
+
+        task.completed = checkbox.checked;
 
         save();
+
         render();
+
     });
 
+
+    text.addEventListener("blur", () => {
+
+        const value = text.textContent.trim();
+
+        if (!value) {
+
+            tasks = tasks.filter(
+                t => t.id !== task.id
+            );
+
+        } else {
+
+            task.text = value;
+
+        }
+
+        save();
+
+        render();
+
+    });
+
+
+    text.addEventListener("keydown", event => {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            text.blur();
+
+        }
+
+        if (
+            event.key === "Backspace" &&
+            text.textContent.trim() === ""
+        ) {
+
+            tasks = tasks.filter(
+                t => t.id !== task.id
+            );
+
+            save();
+
+            render();
+
+        }
+
+    });
+
+
+    row.appendChild(checkbox);
+
+    row.appendChild(text);
+
+    return row;
+}
+
+
+function render() {
+
+    activeList.innerHTML = "";
+    completedList.innerHTML = "";
+
+
+    const active =
+        tasks.filter(task => !task.completed);
+
+    const completed =
+        tasks.filter(task => task.completed);
+
+
+    active.forEach(task => {
+
+        activeList.appendChild(
+            createTask(task)
+        );
+
+    });
+
+
+    completed.forEach(task => {
+
+        completedList.appendChild(
+            createTask(task)
+        );
+
+    });
+
+
+    activeCounter.textContent =
+        `${active.length} active`;
+
+
+    completedCounter.textContent =
+        completed.length;
+
+
+    if (completed.length === 0) {
+
+        completedList.innerHTML =
+            `<div class="empty">Nothing completed</div>`;
+
+    }
+
+}
+
+
+newTask.addEventListener("keydown", event => {
+
+    if (event.key !== "Enter") return;
+
+    const value =
+        newTask.value.trim();
+
+    if (!value) return;
+
+
+    tasks.push({
+
+        id: crypto.randomUUID(),
+
+        text: value,
+
+        completed: false
+
+    });
+
+
+    newTask.value = "";
+
+    save();
+
     render();
+
+});
+
+
+render();
+
 </script>
 
 </body>
