@@ -101,24 +101,20 @@
             <div class="flex items-center gap-3">
                 <h1 class="text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">Задачи</h1>
                 <span id="activeCount" class="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-medium">0</span>
-                <span id="syncBadge" class="hidden text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                <span id="syncBadge" class="hidden text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     Облако
                 </span>
             </div>
             
             <div class="flex items-center gap-2">
-                <!-- Sync Button (Google or Key) -->
+                <!-- Sync Modal Trigger -->
                 <button id="openSyncModalBtn" class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all text-zinc-700 dark:text-zinc-300">
                     <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     <span id="syncBtnLabel">Синхронизация</span>
                 </button>
-
-                <!-- Profile avatar if logged in -->
-                <div id="userProfile" class="hidden flex items-center gap-2">
-                    <img id="userAvatar" class="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800 object-cover" src="" alt="Avatar">
-                </div>
 
                 <!-- Clear completed tasks button -->
                 <button id="clearCompletedBtn" class="hidden p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900" title="Очистить завершенные">
@@ -129,9 +125,7 @@
 
                 <!-- Theme Toggle Button -->
                 <button id="themeToggle" class="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900" title="Переключить тему">
-                    <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <!-- Icon swapped dynamically -->
-                    </svg>
+                    <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
                 </button>
             </div>
         </header>
@@ -175,12 +169,12 @@
         </footer>
     </div>
 
-    <!-- Modal: Multi-Device Sync Options -->
+    <!-- Modal: Multi-Device Sync Code Options -->
     <div id="syncModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-6">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-5">
             
             <div class="flex justify-between items-center">
-                <h3 class="text-base font-medium text-zinc-900 dark:text-zinc-100">Синхронизация между устройствами</h3>
+                <h3 class="text-base font-medium text-zinc-900 dark:text-zinc-100">Синхронизация через Облако</h3>
                 <button id="closeSyncModalBtn" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -188,83 +182,63 @@
                 </button>
             </div>
 
-            <!-- Notification banner for Google Auth errors if any -->
-            <div id="authNotice" class="hidden p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs">
-                Google Auth блокируется в вашем браузере/домене. Используйте <strong>Синхро-код</strong> ниже — он работает везде!
-            </div>
-
-            <!-- Option 1: Google Login -->
-            <div class="space-y-2 border-b border-zinc-100 dark:border-zinc-800/80 pb-5">
-                <p class="text-xs font-medium uppercase tracking-wider text-zinc-400">Способ 1. Google Аккаунт</p>
-                <div id="googleSection">
-                    <button id="googleAuthBtn" class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-xs font-medium text-zinc-800 dark:text-zinc-200">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                        </svg>
-                        Войти через Google
-                    </button>
-                </div>
-                <div id="googleLoggedSection" class="hidden flex items-center justify-between py-1">
-                    <span id="userEmail" class="text-xs text-zinc-500 dark:text-zinc-400"></span>
-                    <button id="googleLogoutBtn" class="text-xs text-red-500 hover:underline">Выйти</button>
-                </div>
-            </div>
-
-            <!-- Option 2: 6-Digit Sync Code -->
             <div class="space-y-3">
-                <p class="text-xs font-medium uppercase tracking-wider text-zinc-400">Способ 2. Персональный Синхро-код</p>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                    Введите любой свой код (например, <code class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-zinc-800 dark:text-zinc-200">my-tasks-777</code>). Введите его же на других устройствах, чтобы использовать один список без паролей!
+                    Введите одинаковый <strong>Синхро-код</strong> на всех ваших устройствах (ноутбук, телефон), чтобы видеть один список задач в реальном времени!
                 </p>
                 <div class="flex gap-2">
                     <input 
                         type="text" 
                         id="syncCodeInput" 
-                        placeholder="Код (например: my-list)"
-                        class="flex-grow bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs rounded-xl px-3 py-2 outline-none focus:border-zinc-900 dark:focus:border-zinc-300 font-mono"
+                        placeholder="Код (например: my-tasks-777)"
+                        class="flex-grow bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs rounded-xl px-3 py-2.5 outline-none focus:border-zinc-900 dark:focus:border-zinc-300 font-mono text-zinc-900 dark:text-zinc-100"
                     >
-                    <button id="applySyncCodeBtn" class="px-4 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 transition-opacity rounded-xl text-xs font-medium">
+                    <button id="applySyncCodeBtn" class="px-4 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 transition-opacity rounded-xl text-xs font-medium">
                         Подключить
                     </button>
                 </div>
+            </div>
+
+            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/80 flex justify-between items-center text-xs text-zinc-400">
+                <span>Статус подключения:</span>
+                <span id="modalStatusText" class="font-medium text-emerald-500">Подключено к Firestore</span>
             </div>
 
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Environment Setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'minimal-tasks-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyDemoConfigFallbackApiKey12345678",
-            authDomain: "demo-app.firebaseapp.com",
-            projectId: "demo-app",
-            storageBucket: "demo-app.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:123456789"
+        // User's Real Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9-FySSKcaU-djgAXHmmi7DQoHIHNOY24",
+            authDomain: "task-task-70067.firebaseapp.com",
+            projectId: "task-task-70067",
+            storageBucket: "task-task-70067.firebasestorage.app",
+            messagingSenderId: "19699022007",
+            appId: "1:19699022007:web:b678be866ae4cf3689b532",
+            measurementId: "G-NXGYWXR1B4"
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
 
-        // --- State ---
+        // --- State Management ---
         let tasks = JSON.parse(localStorage.getItem('minimal_tasks')) || [
             { id: 1, text: 'Добро пожаловать в трекер задач', completed: false },
             { id: 2, text: 'Нажмите на квадратик слева, чтобы завершить', completed: false },
             { id: 3, text: 'Двойной клик по тексту для редактирования', completed: true }
         ];
 
-        let currentSyncId = localStorage.getItem('minimal_sync_code') || null;
-        let currentUser = null;
+        // Generate or retrieve room code
+        let syncCode = localStorage.getItem('minimal_sync_code');
+        if (!syncCode) {
+            syncCode = 'room-' + Math.random().toString(36).substring(2, 8);
+            localStorage.setItem('minimal_sync_code', syncCode);
+        }
+
         let unsubscribeFirestore = null;
 
         // --- DOM Elements ---
@@ -279,50 +253,54 @@
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
 
-        // Sync Modal & Controls
+        // Modal Elements
         const syncModal = document.getElementById('syncModal');
         const openSyncModalBtn = document.getElementById('openSyncModalBtn');
         const closeSyncModalBtn = document.getElementById('closeSyncModalBtn');
         const syncBtnLabel = document.getElementById('syncBtnLabel');
         const syncBadge = document.getElementById('syncBadge');
-        const googleAuthBtn = document.getElementById('googleAuthBtn');
-        const googleLoggedSection = document.getElementById('googleLoggedSection');
-        const googleSection = document.getElementById('googleSection');
-        const userEmail = document.getElementById('userEmail');
-        const googleLogoutBtn = document.getElementById('googleLogoutBtn');
-        const userProfile = document.getElementById('userProfile');
-        const userAvatar = document.getElementById('userAvatar');
         const syncCodeInput = document.getElementById('syncCodeInput');
         const applySyncCodeBtn = document.getElementById('applySyncCodeBtn');
-        const authNotice = document.getElementById('authNotice');
+        const modalStatusText = document.getElementById('modalStatusText');
 
         async function saveTasks() {
+            // Local backup
             localStorage.setItem('minimal_tasks', JSON.stringify(tasks));
 
-            const targetSyncId = currentUser ? currentUser.uid : currentSyncId;
-            if (targetSyncId) {
+            // Sync to Firestore
+            if (syncCode) {
                 try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', `tasks_${targetSyncId}`);
-                    await setDoc(docRef, { tasks: tasks }, { merge: true });
+                    const docRef = doc(db, 'tasks', syncCode);
+                    await setDoc(docRef, { tasks: tasks, updatedAt: Date.now() }, { merge: true });
                 } catch (err) {
-                    console.warn("Ошибка сохранения в облаке:", err);
+                    console.error("Ошибка сохранени в Firestore:", err);
+                    modalStatusText.textContent = "Ошибка сети";
+                    modalStatusText.className = "font-medium text-amber-500";
                 }
             }
         }
 
-        function subscribeToCloud(syncId) {
+        function subscribeToCloud(code) {
             if (unsubscribeFirestore) unsubscribeFirestore();
 
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', `tasks_${syncId}`);
+            const docRef = doc(db, 'tasks', code);
             unsubscribeFirestore = onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists() && docSnap.data().tasks) {
                     tasks = docSnap.data().tasks;
+                    localStorage.setItem('minimal_tasks', JSON.stringify(tasks));
                     render();
                 } else {
-                    saveTasks(); // Push local initial state
+                    // Push local tasks if empty cloud document
+                    saveTasks();
                 }
+                syncBadge.classList.remove('hidden');
+                syncBtnLabel.textContent = `Код: ${code}`;
+                modalStatusText.textContent = `Синхронизировано (${code})`;
+                modalStatusText.className = "font-medium text-emerald-500";
             }, (error) => {
-                console.warn("Ошибка подписки на облако:", error);
+                console.error("Ошибка подписки Firestore:", error);
+                modalStatusText.textContent = "Ошибка доступа к БД";
+                modalStatusText.className = "font-medium text-red-500";
             });
         }
 
@@ -342,18 +320,6 @@
 
             activeTasks.forEach(t => activeTaskList.appendChild(createTaskNode(t)));
             completedTasks.forEach(t => completedTaskList.appendChild(createTaskNode(t)));
-
-            // Update Sync Status Visuals
-            if (currentUser) {
-                syncBadge.classList.remove('hidden');
-                syncBtnLabel.textContent = 'Подключено';
-            } else if (currentSyncId) {
-                syncBadge.classList.remove('hidden');
-                syncBtnLabel.textContent = `Код: ${currentSyncId.substring(0, 8)}`;
-            } else {
-                syncBadge.classList.add('hidden');
-                syncBtnLabel.textContent = 'Синхронизация';
-            }
         }
 
         function createTaskNode(task) {
@@ -457,7 +423,7 @@
             input.select();
         }
 
-        // Event Listeners for Tasks
+        // Task Event Listeners
         taskInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') addTask(taskInput.value);
         });
@@ -468,64 +434,18 @@
             render();
         });
 
-        // Google Auth Click Handler
-        googleAuthBtn.addEventListener('click', async () => {
-            try {
-                authNotice.classList.add('hidden');
-                await signInWithPopup(auth, googleProvider);
-            } catch (error) {
-                console.error("Auth Popup Error:", error);
-                authNotice.classList.remove('hidden');
-            }
-        });
-
-        googleLogoutBtn.addEventListener('click', () => signOut(auth));
-
-        // Sync Code Handler
         applySyncCodeBtn.addEventListener('click', () => {
             const code = syncCodeInput.value.trim();
             if (code) {
-                currentSyncId = code;
+                syncCode = code;
                 localStorage.setItem('minimal_sync_code', code);
                 subscribeToCloud(code);
                 closeModal();
-                render();
-            } else {
-                localStorage.removeItem('minimal_sync_code');
-                currentSyncId = null;
-                if (unsubscribeFirestore) unsubscribeFirestore();
-                render();
             }
         });
 
-        // Auth Observer
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                googleSection.classList.add('hidden');
-                googleLoggedSection.classList.remove('hidden');
-                userEmail.textContent = user.email || user.displayName;
-                userProfile.classList.remove('hidden');
-                userAvatar.src = user.photoURL || `https://placehold.co/100x100/18181b/ffffff?text=${encodeURIComponent(user.displayName ? user.displayName[0] : 'U')}`;
-                
-                subscribeToCloud(user.uid);
-            } else {
-                googleSection.classList.remove('hidden');
-                googleLoggedSection.classList.add('hidden');
-                userProfile.classList.add('hidden');
-
-                if (currentSyncId) {
-                    subscribeToCloud(currentSyncId);
-                } else if (unsubscribeFirestore) {
-                    unsubscribeFirestore();
-                }
-            }
-            render();
-        });
-
-        // Modal Controls
         function openModal() {
-            if (currentSyncId) syncCodeInput.value = currentSyncId;
+            if (syncCode) syncCodeInput.value = syncCode;
             syncModal.classList.remove('opacity-0', 'pointer-events-none');
         }
 
@@ -560,8 +480,12 @@
             setThemeIcon(isDark);
         });
 
+        // Initialize App & Firestore Listener
         initTheme();
         render();
+        if (syncCode) {
+            subscribeToCloud(syncCode);
+        }
     </script>
 </body>
 </html>
