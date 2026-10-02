@@ -23,7 +23,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        /* Custom smooth checkmark styling */
         .custom-checkbox {
             position: relative;
             width: 1.25rem;
@@ -42,7 +41,6 @@
             stroke-dashoffset: 0;
         }
 
-        /* Strike-through text animation */
         .task-text {
             position: relative;
             transition: color 0.3s ease, opacity 0.3s ease;
@@ -64,15 +62,14 @@
             width: 100%;
         }
 
-        /* Entry & Exit animations for list items */
         .task-item {
-            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-6px);
+                transform: translateY(-4px);
             }
             to {
                 opacity: 1;
@@ -80,9 +77,8 @@
             }
         }
 
-        /* Ultra thin scrollbar */
         ::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
@@ -96,42 +92,32 @@
         }
     </style>
 </head>
-<body class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen font-sans antialiased transition-colors duration-300 selection:bg-zinc-200 dark:selection:bg-zinc-800">
+<body class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen font-sans antialiased transition-colors duration-300 selection:bg-zinc-200 dark:selection:bg-zinc-800 flex flex-col justify-between">
 
-    <div class="max-w-2xl mx-auto px-6 py-12 md:py-20 flex flex-col min-h-screen">
+    <div class="max-w-2xl w-full mx-auto px-6 py-10 md:py-16 flex flex-col flex-grow">
         
         <!-- Header -->
-        <header class="flex justify-between items-center mb-10">
+        <header class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <h1 class="text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">Задачи</h1>
-                <span id="activeCount" class="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-medium transition-all">0</span>
+                <span id="activeCount" class="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-medium">0</span>
                 <span id="syncBadge" class="hidden text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                     Облако
                 </span>
             </div>
             
             <div class="flex items-center gap-2">
-                <!-- User Auth Profile / Login Button -->
-                <div id="authContainer" class="flex items-center gap-2">
-                    <button id="loginBtn" class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all text-zinc-700 dark:text-zinc-300 relative">
-                        <span id="loginSpinner" class="hidden animate-spin h-3.5 w-3.5 border-2 border-zinc-400 border-t-transparent rounded-full"></span>
-                        <svg id="googleLogo" class="w-3.5 h-3.5" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                        </svg>
-                        <span id="loginText">Войти</span>
-                    </button>
+                <!-- Sync Button (Google or Key) -->
+                <button id="openSyncModalBtn" class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all text-zinc-700 dark:text-zinc-300">
+                    <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span id="syncBtnLabel">Синхронизация</span>
+                </button>
 
-                    <div id="userProfile" class="hidden flex items-center gap-2">
-                        <img id="userAvatar" class="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800 object-cover" src="" alt="Avatar">
-                        <button id="logoutBtn" class="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900" title="Выйти из аккаунта">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                        </button>
-                    </div>
+                <!-- Profile avatar if logged in -->
+                <div id="userProfile" class="hidden flex items-center gap-2">
+                    <img id="userAvatar" class="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800 object-cover" src="" alt="Avatar">
                 </div>
 
                 <!-- Clear completed tasks button -->
@@ -140,17 +126,18 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                 </button>
+
                 <!-- Theme Toggle Button -->
                 <button id="themeToggle" class="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900" title="Переключить тему">
                     <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <!-- Path dynamically swapped via JS -->
+                        <!-- Icon swapped dynamically -->
                     </svg>
                 </button>
             </div>
         </header>
 
         <!-- Main Input Container -->
-        <div class="relative mb-10 group">
+        <div class="relative mb-8 group">
             <input 
                 type="text" 
                 id="taskInput" 
@@ -163,47 +150,98 @@
             </div>
         </div>
 
-        <!-- Task Lists Container -->
-        <main class="flex-grow space-y-12">
-            
-            <!-- Section: Active Tasks -->
+        <!-- Task Lists -->
+        <main class="flex-grow space-y-10">
+            <!-- Active Tasks -->
             <section id="activeSection">
-                <div id="activeTaskList" class="space-y-1">
-                    <!-- Dynamic Active Tasks inserted here -->
-                </div>
-                <!-- Empty state for active list -->
+                <div id="activeTaskList" class="space-y-1"></div>
                 <div id="emptyActive" class="hidden py-12 text-center">
                     <p class="text-sm text-zinc-400 dark:text-zinc-600">Все задачи выполнены. Время отдохнуть ✨</p>
                 </div>
             </section>
 
-            <!-- Section: Completed Tasks -->
+            <!-- Completed Tasks -->
             <section id="completedSection" class="transition-opacity duration-300">
-                <div class="flex items-center gap-2 mb-4">
-                    <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-600">Завершенные</h2>
+                <div class="flex items-center gap-2 mb-3">
+                    <h2 class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-600">Завершенные</h2>
                     <span id="completedCount" class="text-xs text-zinc-400 dark:text-zinc-600 font-normal">0</span>
                 </div>
-                <div id="completedTaskList" class="space-y-1">
-                    <!-- Dynamic Completed Tasks inserted here -->
-                </div>
+                <div id="completedTaskList" class="space-y-1"></div>
             </section>
-
         </main>
 
-        <!-- Footer -->
-        <footer class="mt-16 text-center text-xs text-zinc-400 dark:text-zinc-600">
+        <footer class="mt-12 text-center text-xs text-zinc-400 dark:text-zinc-600">
             <p>Двойной клик по тексту для редактирования</p>
         </footer>
+    </div>
 
+    <!-- Modal: Multi-Device Sync Options -->
+    <div id="syncModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-6">
+            
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-medium text-zinc-900 dark:text-zinc-100">Синхронизация между устройствами</h3>
+                <button id="closeSyncModalBtn" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Notification banner for Google Auth errors if any -->
+            <div id="authNotice" class="hidden p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs">
+                Google Auth блокируется в вашем браузере/домене. Используйте <strong>Синхро-код</strong> ниже — он работает везде!
+            </div>
+
+            <!-- Option 1: Google Login -->
+            <div class="space-y-2 border-b border-zinc-100 dark:border-zinc-800/80 pb-5">
+                <p class="text-xs font-medium uppercase tracking-wider text-zinc-400">Способ 1. Google Аккаунт</p>
+                <div id="googleSection">
+                    <button id="googleAuthBtn" class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        Войти через Google
+                    </button>
+                </div>
+                <div id="googleLoggedSection" class="hidden flex items-center justify-between py-1">
+                    <span id="userEmail" class="text-xs text-zinc-500 dark:text-zinc-400"></span>
+                    <button id="googleLogoutBtn" class="text-xs text-red-500 hover:underline">Выйти</button>
+                </div>
+            </div>
+
+            <!-- Option 2: 6-Digit Sync Code -->
+            <div class="space-y-3">
+                <p class="text-xs font-medium uppercase tracking-wider text-zinc-400">Способ 2. Персональный Синхро-код</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                    Введите любой свой код (например, <code class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-zinc-800 dark:text-zinc-200">my-tasks-777</code>). Введите его же на других устройствах, чтобы использовать один список без паролей!
+                </p>
+                <div class="flex gap-2">
+                    <input 
+                        type="text" 
+                        id="syncCodeInput" 
+                        placeholder="Код (например: my-list)"
+                        class="flex-grow bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs rounded-xl px-3 py-2 outline-none focus:border-zinc-900 dark:focus:border-zinc-300 font-mono"
+                    >
+                    <button id="applySyncCodeBtn" class="px-4 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 transition-opacity rounded-xl text-xs font-medium">
+                        Подключить
+                    </button>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration (Injecting environment variables or demo fallback)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'minimal-task-tracker';
+        // Environment Setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'minimal-tasks-app';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyDemoConfigFallbackApiKey12345678",
             authDomain: "demo-app.firebaseapp.com",
@@ -218,14 +256,16 @@
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
 
-        // --- App State ---
-        let currentUser = null;
-        let unsubscribeSnapshot = null;
+        // --- State ---
         let tasks = JSON.parse(localStorage.getItem('minimal_tasks')) || [
-            { id: 1, text: 'Добро пожаловать в минималистичный трекер', completed: false },
-            { id: 2, text: 'Войдите через Google, чтобы синхронизировать задачи', completed: false },
-            { id: 3, text: 'Нажмите на квадратик слева, чтобы завершить задачу', completed: true }
+            { id: 1, text: 'Добро пожаловать в трекер задач', completed: false },
+            { id: 2, text: 'Нажмите на квадратик слева, чтобы завершить', completed: false },
+            { id: 3, text: 'Двойной клик по тексту для редактирования', completed: true }
         ];
+
+        let currentSyncId = localStorage.getItem('minimal_sync_code') || null;
+        let currentUser = null;
+        let unsubscribeFirestore = null;
 
         // --- DOM Elements ---
         const taskInput = document.getElementById('taskInput');
@@ -238,81 +278,54 @@
         const clearCompletedBtn = document.getElementById('clearCompletedBtn');
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
-        const loginBtn = document.getElementById('loginBtn');
-        const loginSpinner = document.getElementById('loginSpinner');
-        const googleLogo = document.getElementById('googleLogo');
-        const loginText = document.getElementById('loginText');
-        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Sync Modal & Controls
+        const syncModal = document.getElementById('syncModal');
+        const openSyncModalBtn = document.getElementById('openSyncModalBtn');
+        const closeSyncModalBtn = document.getElementById('closeSyncModalBtn');
+        const syncBtnLabel = document.getElementById('syncBtnLabel');
+        const syncBadge = document.getElementById('syncBadge');
+        const googleAuthBtn = document.getElementById('googleAuthBtn');
+        const googleLoggedSection = document.getElementById('googleLoggedSection');
+        const googleSection = document.getElementById('googleSection');
+        const userEmail = document.getElementById('userEmail');
+        const googleLogoutBtn = document.getElementById('googleLogoutBtn');
         const userProfile = document.getElementById('userProfile');
         const userAvatar = document.getElementById('userAvatar');
-        const syncBadge = document.getElementById('syncBadge');
+        const syncCodeInput = document.getElementById('syncCodeInput');
+        const applySyncCodeBtn = document.getElementById('applySyncCodeBtn');
+        const authNotice = document.getElementById('authNotice');
 
-        // Helper to show/hide loading on login button
-        function setLoginLoading(isLoading) {
-            if (isLoading) {
-                loginSpinner.classList.remove('hidden');
-                googleLogo.classList.add('hidden');
-                loginText.textContent = 'Вход...';
-                loginBtn.disabled = true;
-                loginBtn.classList.add('opacity-70', 'cursor-not-allowed');
-            } else {
-                loginSpinner.classList.add('hidden');
-                googleLogo.classList.remove('hidden');
-                loginText.textContent = 'Войти';
-                loginBtn.disabled = false;
-                loginBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
-        }
-
-        // Handle redirect result on page load
-        getRedirectResult(auth)
-            .then((result) => {
-                if (result) {
-                    setLoginLoading(false);
-                }
-            })
-            .catch((error) => {
-                console.error("Ошибка при получении результата перенаправления:", error);
-                setLoginLoading(false);
-            });
-
-        // --- Save Tasks (Firestore or LocalStorage) ---
         async function saveTasks() {
-            if (currentUser) {
+            localStorage.setItem('minimal_tasks', JSON.stringify(tasks));
+
+            const targetSyncId = currentUser ? currentUser.uid : currentSyncId;
+            if (targetSyncId) {
                 try {
-                    // RULE 1: Standardized user path /artifacts/{appId}/users/{userId}/data/tasks
-                    const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'user_tasks');
-                    await setDoc(userDocRef, { tasks: tasks }, { merge: true });
-                } catch (error) {
-                    console.error("Ошибка сохранения в Firestore:", error);
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', `tasks_${targetSyncId}`);
+                    await setDoc(docRef, { tasks: tasks }, { merge: true });
+                } catch (err) {
+                    console.warn("Ошибка сохранения в облаке:", err);
                 }
-            } else {
-                localStorage.setItem('minimal_tasks', JSON.stringify(tasks));
             }
         }
 
-        // --- Firestore Realtime Listener ---
-        function subscribeToFirestore(userId) {
-            if (unsubscribeSnapshot) unsubscribeSnapshot();
+        function subscribeToCloud(syncId) {
+            if (unsubscribeFirestore) unsubscribeFirestore();
 
-            const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'user_tasks');
-            unsubscribeSnapshot = onSnapshot(userDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data && Array.isArray(data.tasks)) {
-                        tasks = data.tasks;
-                        render();
-                    }
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', `tasks_${syncId}`);
+            unsubscribeFirestore = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().tasks) {
+                    tasks = docSnap.data().tasks;
+                    render();
                 } else {
-                    // Initial sync: migrate local tasks to cloud
-                    saveTasks();
+                    saveTasks(); // Push local initial state
                 }
             }, (error) => {
-                console.error("Ошибка синхронизации Firestore:", error);
+                console.warn("Ошибка подписки на облако:", error);
             });
         }
 
-        // --- Render UI ---
         function render() {
             activeTaskList.innerHTML = '';
             completedTaskList.innerHTML = '';
@@ -320,86 +333,65 @@
             const activeTasks = tasks.filter(t => !t.completed);
             const completedTasks = tasks.filter(t => t.completed);
 
-            // Update Counts
             activeCount.textContent = activeTasks.length;
             completedCount.textContent = completedTasks.length;
 
-            // Toggle empty active state
-            if (activeTasks.length === 0) {
-                emptyActive.classList.remove('hidden');
+            emptyActive.classList.toggle('hidden', activeTasks.length > 0);
+            completedSection.classList.toggle('hidden', completedTasks.length === 0);
+            clearCompletedBtn.classList.toggle('hidden', completedTasks.length === 0);
+
+            activeTasks.forEach(t => activeTaskList.appendChild(createTaskNode(t)));
+            completedTasks.forEach(t => completedTaskList.appendChild(createTaskNode(t)));
+
+            // Update Sync Status Visuals
+            if (currentUser) {
+                syncBadge.classList.remove('hidden');
+                syncBtnLabel.textContent = 'Подключено';
+            } else if (currentSyncId) {
+                syncBadge.classList.remove('hidden');
+                syncBtnLabel.textContent = `Код: ${currentSyncId.substring(0, 8)}`;
             } else {
-                emptyActive.classList.add('hidden');
+                syncBadge.classList.add('hidden');
+                syncBtnLabel.textContent = 'Синхронизация';
             }
-
-            // Toggle completed section visibility
-            if (completedTasks.length === 0) {
-                completedSection.classList.add('hidden');
-                clearCompletedBtn.classList.add('hidden');
-            } else {
-                completedSection.classList.remove('hidden');
-                clearCompletedBtn.classList.remove('hidden');
-            }
-
-            // Render Active List
-            activeTasks.forEach(task => {
-                activeTaskList.appendChild(createTaskNode(task));
-            });
-
-            // Render Completed List
-            completedTasks.forEach(task => {
-                completedTaskList.appendChild(createTaskNode(task));
-            });
         }
 
-        // --- Create Task Node ---
         function createTaskNode(task) {
             const wrapper = document.createElement('div');
-            wrapper.className = `task-item group flex items-start gap-3 py-2.5 px-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors ${task.completed ? 'task-completed opacity-50' : ''}`;
-            wrapper.dataset.id = task.id;
+            wrapper.className = `task-item group flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors ${task.completed ? 'task-completed opacity-50' : ''}`;
 
-            // Checkbox markup
-            const checkboxContainer = document.createElement('label');
-            checkboxContainer.className = 'relative flex items-center justify-center cursor-pointer mt-0.5 select-none';
+            const checkboxLabel = document.createElement('label');
+            checkboxLabel.className = 'relative flex items-center justify-center cursor-pointer mt-1 select-none';
 
-            const realCheckbox = document.createElement('input');
-            realCheckbox.type = 'checkbox';
-            realCheckbox.checked = task.completed;
-            realCheckbox.className = 'sr-only';
-            realCheckbox.addEventListener('change', () => toggleTask(task.id));
+            const realInput = document.createElement('input');
+            realInput.type = 'checkbox';
+            realInput.checked = task.completed;
+            realInput.className = 'sr-only';
+            realInput.addEventListener('change', () => toggleTask(task.id));
 
             const customBox = document.createElement('div');
-            customBox.className = 'custom-checkbox border border-zinc-300 dark:border-zinc-700 bg-transparent group-hover:border-zinc-400 dark:group-hover:border-zinc-500 flex items-center justify-center';
-            if (task.completed) {
-                customBox.classList.add('bg-zinc-900', 'dark:bg-zinc-100', 'border-zinc-900', 'dark:border-zinc-100');
-            }
-
+            customBox.className = `custom-checkbox border border-zinc-300 dark:border-zinc-700 bg-transparent flex items-center justify-center ${task.completed ? 'bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100' : ''}`;
             customBox.innerHTML = `
                 <svg class="w-3 h-3 text-white dark:text-zinc-900 custom-checkbox-icon" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                 </svg>
             `;
 
-            checkboxContainer.appendChild(realCheckbox);
-            checkboxContainer.appendChild(customBox);
+            checkboxLabel.appendChild(realInput);
+            checkboxLabel.appendChild(customBox);
 
-            // Task Content
             const textContainer = document.createElement('div');
             textContainer.className = 'flex-grow min-w-0 pr-2';
 
             const textSpan = document.createElement('span');
-            textSpan.className = `task-text inline-block break-words text-base font-normal leading-relaxed text-zinc-800 dark:text-zinc-200 cursor-pointer select-none`;
+            textSpan.className = 'task-text inline-block break-words text-sm md:text-base leading-normal text-zinc-800 dark:text-zinc-200 cursor-pointer select-none';
             textSpan.textContent = task.text;
-
-            // Double click to edit
-            textSpan.addEventListener('dblclick', () => {
-                enableEditing(task.id, textContainer, task.text);
-            });
+            textSpan.addEventListener('dblclick', () => enableEditing(task.id, textContainer, task.text));
 
             textContainer.appendChild(textSpan);
 
-            // Delete button (visible on hover)
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-zinc-300 hover:text-zinc-600 dark:text-zinc-700 dark:hover:text-zinc-300 transition-all p-1 rounded focus:opacity-100';
+            deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-zinc-300 hover:text-zinc-600 dark:text-zinc-700 dark:hover:text-zinc-300 transition-all p-1 rounded';
             deleteBtn.title = 'Удалить';
             deleteBtn.innerHTML = `
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -408,25 +400,17 @@
             `;
             deleteBtn.addEventListener('click', () => deleteTask(task.id));
 
-            wrapper.appendChild(checkboxContainer);
+            wrapper.appendChild(checkboxLabel);
             wrapper.appendChild(textContainer);
             wrapper.appendChild(deleteBtn);
 
             return wrapper;
         }
 
-        // --- Task CRUD Operations ---
         function addTask(text) {
             const trimmed = text.trim();
             if (!trimmed) return;
-
-            const newTask = {
-                id: Date.now(),
-                text: trimmed,
-                completed: false
-            };
-
-            tasks.unshift(newTask);
+            tasks.unshift({ id: Date.now(), text: trimmed, completed: false });
             saveTasks();
             render();
             taskInput.value = '';
@@ -444,20 +428,13 @@
             render();
         }
 
-        clearCompletedBtn.addEventListener('click', () => {
-            tasks = tasks.filter(t => !t.completed);
-            saveTasks();
-            render();
-        });
-
-        // --- Inline Edit Mode ---
         function enableEditing(id, container, currentText) {
             container.innerHTML = '';
             const input = document.createElement('input');
             input.type = 'text';
             input.value = currentText;
-            input.className = 'w-full bg-transparent text-base font-normal text-zinc-900 dark:text-zinc-100 outline-none border-b border-zinc-400 dark:border-zinc-500 py-0.5 px-0';
-            
+            input.className = 'w-full bg-transparent text-sm md:text-base text-zinc-900 dark:text-zinc-100 outline-none border-b border-zinc-400 dark:border-zinc-500 py-0.5 px-0';
+
             const finishEdit = () => {
                 const newText = input.value.trim();
                 if (newText) {
@@ -480,76 +457,101 @@
             input.select();
         }
 
+        // Event Listeners for Tasks
         taskInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') addTask(taskInput.value);
         });
 
-        // --- Firebase Auth Handlers ---
-        loginBtn.addEventListener('click', async () => {
+        clearCompletedBtn.addEventListener('click', () => {
+            tasks = tasks.filter(t => !t.completed);
+            saveTasks();
+            render();
+        });
+
+        // Google Auth Click Handler
+        googleAuthBtn.addEventListener('click', async () => {
             try {
-                setLoginLoading(true);
-                await signInWithRedirect(auth, googleProvider);
+                authNotice.classList.add('hidden');
+                await signInWithPopup(auth, googleProvider);
             } catch (error) {
-                console.error("Ошибка авторизации Google:", error);
-                setLoginLoading(false);
+                console.error("Auth Popup Error:", error);
+                authNotice.classList.remove('hidden');
             }
         });
 
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error("Ошибка выхода:", error);
-            }
-        });
+        googleLogoutBtn.addEventListener('click', () => signOut(auth));
 
-        // Auth State Observer
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                // Logged in UI
-                setLoginLoading(false);
-                loginBtn.classList.add('hidden');
-                userProfile.classList.remove('hidden');
-                syncBadge.classList.remove('hidden');
-                userAvatar.src = user.photoURL || `https://placehold.co/100x100/18181b/ffffff?text=${encodeURIComponent(user.displayName ? user.displayName[0] : 'U')}`;
-                
-                // Subscribe to Cloud Firestore
-                subscribeToFirestore(user.uid);
+        // Sync Code Handler
+        applySyncCodeBtn.addEventListener('click', () => {
+            const code = syncCodeInput.value.trim();
+            if (code) {
+                currentSyncId = code;
+                localStorage.setItem('minimal_sync_code', code);
+                subscribeToCloud(code);
+                closeModal();
+                render();
             } else {
-                // Logged out UI
-                if (unsubscribeSnapshot) unsubscribeSnapshot();
-                setLoginLoading(false);
-                loginBtn.classList.remove('hidden');
-                userProfile.classList.add('hidden');
-                syncBadge.classList.add('hidden');
-                
-                // Load local tasks
-                tasks = JSON.parse(localStorage.getItem('minimal_tasks')) || [];
+                localStorage.removeItem('minimal_sync_code');
+                currentSyncId = null;
+                if (unsubscribeFirestore) unsubscribeFirestore();
                 render();
             }
         });
 
-        // --- Theme Switcher ---
+        // Auth Observer
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                googleSection.classList.add('hidden');
+                googleLoggedSection.classList.remove('hidden');
+                userEmail.textContent = user.email || user.displayName;
+                userProfile.classList.remove('hidden');
+                userAvatar.src = user.photoURL || `https://placehold.co/100x100/18181b/ffffff?text=${encodeURIComponent(user.displayName ? user.displayName[0] : 'U')}`;
+                
+                subscribeToCloud(user.uid);
+            } else {
+                googleSection.classList.remove('hidden');
+                googleLoggedSection.classList.add('hidden');
+                userProfile.classList.add('hidden');
+
+                if (currentSyncId) {
+                    subscribeToCloud(currentSyncId);
+                } else if (unsubscribeFirestore) {
+                    unsubscribeFirestore();
+                }
+            }
+            render();
+        });
+
+        // Modal Controls
+        function openModal() {
+            if (currentSyncId) syncCodeInput.value = currentSyncId;
+            syncModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeModal() {
+            syncModal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        openSyncModalBtn.addEventListener('click', openModal);
+        closeSyncModalBtn.addEventListener('click', closeModal);
+        syncModal.addEventListener('click', (e) => {
+            if (e.target === syncModal) closeModal();
+        });
+
         function initTheme() {
             const savedTheme = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
             
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                document.documentElement.classList.add('dark');
-                setThemeIcon(true);
-            } else {
-                document.documentElement.classList.remove('dark');
-                setThemeIcon(false);
-            }
+            document.documentElement.classList.toggle('dark', isDark);
+            setThemeIcon(isDark);
         }
 
         function setThemeIcon(isDark) {
-            if (isDark) {
-                themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
-            } else {
-                themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
-            }
+            themeIcon.innerHTML = isDark
+                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`
+                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
         }
 
         themeToggle.addEventListener('click', () => {
@@ -558,7 +560,6 @@
             setThemeIcon(isDark);
         });
 
-        // Initial setup
         initTheme();
         render();
     </script>
