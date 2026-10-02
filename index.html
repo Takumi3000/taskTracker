@@ -1,1 +1,263 @@
 
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #fff;
+            color: #111;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .app {
+            width: min(900px, calc(100% - 40px));
+            margin: 70px auto;
+        }
+
+        h1 {
+            margin: 0 0 45px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task {
+            display: flex;
+            align-items: center;
+            min-height: 42px;
+            font-size: 17px;
+            line-height: 1.4;
+        }
+
+        .checkbox {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #999;
+            margin: 0 14px 0 0;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .checkbox:checked {
+            background: #111;
+            border-color: #111;
+        }
+
+        .checkbox:checked::after {
+            content: "✓";
+            display: block;
+            color: white;
+            font-size: 11px;
+            line-height: 14px;
+            text-align: center;
+        }
+
+        .task-text {
+            outline: none;
+            min-width: 20px;
+            flex: 1;
+        }
+
+        .task.completed .task-text {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .add-task {
+            margin-top: 8px;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+        }
+
+        .add-input {
+            border: 0;
+            outline: 0;
+            width: 100%;
+            padding: 0;
+            font: inherit;
+            font-size: 17px;
+            color: #111;
+            background: transparent;
+        }
+
+        .add-input::placeholder {
+            color: #bbb;
+        }
+
+        .section {
+            margin-top: 65px;
+        }
+
+        .section-title {
+            margin-bottom: 12px;
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        @media (max-width: 600px) {
+            .app {
+                width: calc(100% - 28px);
+                margin: 35px auto;
+            }
+
+            h1 {
+                margin-bottom: 30px;
+            }
+
+            .task,
+            .add-input {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <h1>Tasks</h1>
+
+    <div class="list" id="activeList"></div>
+
+    <div class="add-task">
+        <input
+            id="newTask"
+            class="add-input"
+            type="text"
+            placeholder="Новая задача..."
+            autocomplete="off"
+        >
+    </div>
+
+    <div class="section">
+        <div class="section-title">Completed</div>
+        <div class="list" id="completedList"></div>
+    </div>
+
+</div>
+
+<script>
+    const STORAGE_KEY = "tasks";
+
+    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+        { id: crypto.randomUUID(), text: "Сделать первый проект", completed: false },
+        { id: crypto.randomUUID(), text: "Разобраться с задачами", completed: false }
+    ];
+
+    const activeList = document.getElementById("activeList");
+    const completedList = document.getElementById("completedList");
+    const newTask = document.getElementById("newTask");
+
+    function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function render() {
+        activeList.innerHTML = "";
+        completedList.innerHTML = "";
+
+        tasks
+            .filter(task => !task.completed)
+            .forEach(task => {
+                activeList.appendChild(createTask(task));
+            });
+
+        tasks
+            .filter(task => task.completed)
+            .forEach(task => {
+                completedList.appendChild(createTask(task));
+            });
+    }
+
+    function createTask(task) {
+        const row = document.createElement("div");
+        row.className = "task" + (task.completed ? " completed" : "");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "checkbox";
+        checkbox.checked = task.completed;
+
+        const text = document.createElement("div");
+        text.className = "task-text";
+        text.contentEditable = "true";
+        text.spellcheck = false;
+        text.textContent = task.text;
+
+        checkbox.addEventListener("change", () => {
+            task.completed = checkbox.checked;
+            save();
+            render();
+        });
+
+        text.addEventListener("blur", () => {
+            const value = text.textContent.trim();
+
+            if (!value) {
+                tasks = tasks.filter(t => t.id !== task.id);
+            } else {
+                task.text = value;
+            }
+
+            save();
+            render();
+        });
+
+        text.addEventListener("keydown", event => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                text.blur();
+            }
+        });
+
+        row.appendChild(checkbox);
+        row.appendChild(text);
+
+        return row;
+    }
+
+    newTask.addEventListener("keydown", event => {
+        if (event.key !== "Enter") return;
+
+        const text = newTask.value.trim();
+
+        if (!text) return;
+
+        tasks.push({
+            id: crypto.randomUUID(),
+            text,
+            completed: false
+        });
+
+        newTask.value = "";
+
+        save();
+        render();
+    });
+
+    render();
+</script>
+
+</body>
+</html>
+```
