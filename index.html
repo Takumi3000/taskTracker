@@ -144,7 +144,7 @@
             <input 
                 type="text" 
                 id="taskInput" 
-                placeholder="Что нужно сделать?" 
+                placeholder="Что нужно сделать? (добавьте ! для приоритета)" 
                 autocomplete="off"
                 class="w-full bg-transparent text-lg md:text-xl font-normal placeholder-zinc-400 dark:placeholder-zinc-600 text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-zinc-800 focus:border-zinc-900 dark:focus:border-zinc-100 py-3 px-1 outline-none transition-colors duration-200"
             >
@@ -174,7 +174,7 @@
         </main>
 
         <footer class="mt-12 text-center text-xs text-zinc-400 dark:text-zinc-600">
-            <p>Двойной клик по тексту для редактирования</p>
+            <p>Двойной клик для редактирования • Нажмите на точку для смены приоритета</p>
         </footer>
     </div>
 
@@ -236,9 +236,7 @@
 
         // --- State Management ---
         let tasks = JSON.parse(localStorage.getItem('minimal_tasks')) || [];
-
         let syncCode = localStorage.getItem('minimal_sync_code') || 'айдай';
-
         let unsubscribeFirestore = null;
 
         // --- DOM Elements ---
@@ -305,7 +303,11 @@
             activeTaskList.innerHTML = '';
             completedTaskList.innerHTML = '';
 
-            const activeTasks = tasks.filter(t => !t.completed);
+            // Сортировка: Сначала приоритетные (important), затем остальные
+            const activeTasks = tasks
+                .filter(t => !t.completed)
+                .sort((a, b) => (b.important ? 1 : 0) - (a.important ? 1 : 0));
+                
             const completedTasks = tasks.filter(t => t.completed);
 
             activeCount.textContent = activeTasks.length;
@@ -324,7 +326,7 @@
             wrapper.className = `task-item group flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors ${task.completed ? 'task-completed opacity-50' : ''}`;
 
             const checkboxLabel = document.createElement('label');
-            checkboxLabel.className = 'relative flex items-center justify-center cursor-pointer mt-1 select-none';
+            checkboxLabel.className = 'relative flex items-center justify-center cursor-pointer mt-1 select-none shrink-0';
 
             const realInput = document.createElement('input');
             realInput.type = 'checkbox';
@@ -344,17 +346,27 @@
             checkboxLabel.appendChild(customBox);
 
             const textContainer = document.createElement('div');
-            textContainer.className = 'flex-grow min-w-0 pr-2';
+            textContainer.className = 'flex-grow min-w-0 pr-2 flex items-center gap-2 mt-0.5';
+
+            // Красная точка-индикатор приоритета
+            const priorityBtn = document.createElement('button');
+            priorityBtn.className = 'focus:outline-none p-0.5 rounded transition-transform active:scale-125';
+            priorityBtn.title = task.important ? 'Снять приоритет' : 'Сделать приоритетным';
+            priorityBtn.innerHTML = task.important 
+                ? `<span class="block w-2 h-2 rounded-full bg-red-500 shrink-0 shadow-sm shadow-red-500/50"></span>`
+                : `<span class="block w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 group-hover:bg-zinc-300 dark:group-hover:bg-zinc-700 transition-colors shrink-0"></span>`;
+            priorityBtn.addEventListener('click', () => togglePriority(task.id));
 
             const textSpan = document.createElement('span');
             textSpan.className = 'task-text inline-block break-words text-sm md:text-base leading-normal text-zinc-800 dark:text-zinc-200 cursor-pointer select-none';
             textSpan.textContent = task.text;
             textSpan.addEventListener('dblclick', () => enableEditing(task.id, textContainer, task.text));
 
+            textContainer.appendChild(priorityBtn);
             textContainer.appendChild(textSpan);
 
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-zinc-300 hover:text-zinc-600 dark:text-zinc-700 dark:hover:text-zinc-300 transition-all p-1 rounded';
+            deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-zinc-300 hover:text-zinc-600 dark:text-zinc-700 dark:hover:text-zinc-300 transition-all p-1 rounded shrink-0';
             deleteBtn.title = 'Удалить';
             deleteBtn.innerHTML = `
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,9 +383,25 @@
         }
 
         function addTask(text) {
-            const trimmed = text.trim();
+            let trimmed = text.trim();
             if (!trimmed) return;
-            tasks.unshift({ id: Date.now(), text: trimmed, completed: false });
+
+            // Проверка на ! для установки приоритета
+            let isImportant = false;
+            if (trimmed.startsWith('!') || trimmed.endsWith('!')) {
+                isImportant = true;
+                trimmed = trimmed.replace(/^!|!$/g, '').trim();
+            }
+
+            if (!trimmed) return;
+
+            tasks.unshift({ 
+                id: Date.now(), 
+                text: trimmed, 
+                completed: false, 
+                important: isImportant 
+            });
+
             saveTasks();
             render();
             taskInput.value = '';
@@ -381,6 +409,12 @@
 
         function toggleTask(id) {
             tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveTasks();
+            render();
+        }
+
+        function togglePriority(id) {
+            tasks = tasks.map(t => t.id === id ? { ...t, important: !t.important } : t);
             saveTasks();
             render();
         }
