@@ -13,11 +13,3 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request).catch(() => caches.match(event.request))
   );
 });
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW зарегистрирован:', reg))
-      .catch(err => console.error('Ошибка SW:', err));
-  });
-}
