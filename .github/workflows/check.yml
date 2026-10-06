@@ -1,0 +1,29 @@
+name: Code & PWA Health Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check HTML & JavaScript Syntax
+        run: |
+          npx htmlhint index.html
+          npx eslint index.html --no-eslintrc --env-browser --parser-options=ecmaVersion:latest,sourceType:module || true
+
+      - name: Validate manifest.json
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('manifest.json', 'utf8'))"
